@@ -1,0 +1,556 @@
+{
+  "dataset_name": "BotDriftBench",
+  "version": "0.1.0",
+  "description": "A controlled, reproducible benchmark for evaluating social-bot detection under parameterized behavioral shifts. Features are calibrated against published bot detection research. Each account is a longitudinal trajectory with Markov state carry-forward.",
+  "generated_at": "2026-09-01T22:33:16.039842",
+  "parameters": {
+    "seed": 42,
+    "n_accounts": 1000,
+    "n_time_windows": 20,
+    "drift_magnitude": 1.0,
+    "tau_start": 5,
+    "tau_end": 15
+  },
+  "statistics": {
+    "n_total_observations": 20000,
+    "n_human_accounts": 500,
+    "n_bot_accounts": 500,
+    "n_features": 30
+  },
+  "mathematical_framework": {
+    "evolution_model": "X_{i,j,t} = X_{i,j,t-1} + trend_j + noise_{i,j,t}",
+    "drift_model": "X_{i,j,t} = X_{i,j,t-1} + trend_j + delta_{s,j} * magnitude * per_step + noise_{i,j,t}",
+    "noise_distribution": "N(0, sigma_{natural,j})",
+    "drift_magnitude_param": 1.0,
+    "change_point_tau_start": 5,
+    "change_point_tau_end": 15
+  },
+  "temporal_coverage": {
+    "start_date": "2023-01-01",
+    "end_date": "2024-07-24",
+    "window_interval_days": 30
+  },
+  "feature_groups": {
+    "profile": [
+      "account_age_days",
+      "statuses_count",
+      "followers_count",
+      "friends_count",
+      "favourites_count",
+      "listed_count",
+      "default_profile",
+      "default_profile_image",
+      "has_url",
+      "verified",
+      "description_length",
+      "screen_name_length"
+    ],
+    "behavioral": [
+      "tweets_per_day",
+      "retweet_ratio",
+      "reply_ratio",
+      "mention_count_avg",
+      "hashtag_count_avg",
+      "url_share_ratio",
+      "posting_regularity",
+      "night_post_ratio",
+      "weekend_ratio",
+      "burst_score"
+    ],
+    "content": [
+      "avg_tweet_length",
+      "vocabulary_richness",
+      "text_entropy",
+      "emoji_ratio",
+      "caps_ratio",
+      "content_similarity"
+    ],
+    "network": [
+      "follower_friend_ratio",
+      "reputation_score"
+    ]
+  },
+  "drift_scenarios": {
+    "no_drift": {
+      "description": "Control group \u2014 no injected drift beyond natural evolution.",
+      "drift_mode": "none",
+      "affected_features": [],
+      "drift_vector": {},
+      "multiplicative_features": [],
+      "literature_basis": "Baseline comparison group"
+    },
+    "activity_drift": {
+      "description": "D1 \u2014 Activity drift: posting frequency, timing, and volume patterns shift as bots adapt schedules to evade temporal detection heuristics.",
+      "drift_mode": "gradual",
+      "affected_features": [
+        "tweets_per_day",
+        "posting_regularity",
+        "night_post_ratio",
+        "burst_score",
+        "weekend_ratio"
+      ],
+      "drift_vector": {
+        "tweets_per_day": -0.5,
+        "posting_regularity": -0.25,
+        "night_post_ratio": -0.15,
+        "burst_score": -0.4,
+        "weekend_ratio": 0.03
+      },
+      "multiplicative_features": [
+        "burst_score",
+        "tweets_per_day"
+      ],
+      "literature_basis": "Hays et al. (2025): bot posting patterns become less distinguishable over time"
+    },
+    "linguistic_drift": {
+      "description": "D2 \u2014 Linguistic drift: bots adopt LLM-generated text, increasing vocabulary diversity, text entropy, and tweet length while reducing content repetitiveness.",
+      "drift_mode": "gradual",
+      "affected_features": [
+        "text_entropy",
+        "vocabulary_richness",
+        "content_similarity",
+        "avg_tweet_length",
+        "caps_ratio"
+      ],
+      "drift_vector": {
+        "text_entropy": 0.8,
+        "vocabulary_richness": 0.15,
+        "content_similarity": -0.2,
+        "avg_tweet_length": 30.0,
+        "caps_ratio": -0.03
+      },
+      "multiplicative_features": [],
+      "literature_basis": "BotEvo (2026): LLM-equipped bots produce higher entropy, richer vocabulary text"
+    },
+    "coordination_drift": {
+      "description": "D3 \u2014 Coordination drift: bots shift engagement patterns to mimic authentic interaction \u2014 more replies, fewer bulk retweets, reduced hashtag/URL spam.",
+      "drift_mode": "gradual",
+      "affected_features": [
+        "reply_ratio",
+        "retweet_ratio",
+        "mention_count_avg",
+        "hashtag_count_avg",
+        "url_share_ratio"
+      ],
+      "drift_vector": {
+        "reply_ratio": 0.12,
+        "retweet_ratio": -0.15,
+        "mention_count_avg": -0.8,
+        "hashtag_count_avg": -0.6,
+        "url_share_ratio": -0.1
+      },
+      "multiplicative_features": [],
+      "literature_basis": "TwiBotX (2026); TwiBot-22: engagement ratios are key discriminators"
+    },
+    "network_drift": {
+      "description": "D4 \u2014 Network/profile drift: bot profiles mature \u2014 custom images, bios, URLs added, follower counts grown organically, reputation scores improve.",
+      "drift_mode": "gradual",
+      "affected_features": [
+        "default_profile",
+        "default_profile_image",
+        "has_url",
+        "description_length",
+        "followers_count",
+        "listed_count",
+        "reputation_score"
+      ],
+      "drift_vector": {
+        "default_profile": -0.5,
+        "default_profile_image": -0.4,
+        "has_url": 0.45,
+        "description_length": 35.0,
+        "followers_count": 0.5,
+        "listed_count": 3.0,
+        "reputation_score": 0.12
+      },
+      "multiplicative_features": [
+        "followers_count"
+      ],
+      "literature_basis": "Cresci (2017): paradigm-shift from sparse to sophisticated profiles"
+    },
+    "combined_drift": {
+      "description": "D5 \u2014 Combined/adversarial drift: simultaneous evolution across activity, linguistic, and coordination dimensions. Simulates a sophisticated adversary adapting multiple behavioral axes at once.",
+      "drift_mode": "gradual",
+      "affected_features": [
+        "tweets_per_day",
+        "posting_regularity",
+        "text_entropy",
+        "vocabulary_richness",
+        "content_similarity",
+        "reply_ratio",
+        "retweet_ratio"
+      ],
+      "drift_vector": {
+        "tweets_per_day": -0.35,
+        "posting_regularity": -0.18,
+        "text_entropy": 0.5,
+        "vocabulary_richness": 0.1,
+        "content_similarity": -0.15,
+        "reply_ratio": 0.08,
+        "retweet_ratio": -0.1
+      },
+      "multiplicative_features": [
+        "tweets_per_day"
+      ],
+      "literature_basis": "BotEvo (2026); Hays (2025): real bot evolution is multi-dimensional"
+    }
+  },
+  "initial_distributions": {
+    "account_age_days": {
+      "type": "lognormal",
+      "human_params": [
+        6.5,
+        1.1
+      ],
+      "bot_params": [
+        6.0,
+        1.3
+      ],
+      "evidence": "Cresci 2017 (heavy overlap)"
+    },
+    "statuses_count": {
+      "type": "lognormal",
+      "human_params": [
+        7.5,
+        1.7
+      ],
+      "bot_params": [
+        7.6,
+        1.8
+      ],
+      "evidence": "TwiBot-22 (near-identical)"
+    },
+    "followers_count": {
+      "type": "lognormal",
+      "human_params": [
+        4.5,
+        2.2
+      ],
+      "bot_params": [
+        4.0,
+        2.3
+      ],
+      "evidence": "Cresci 2017 (heavy overlap)"
+    },
+    "friends_count": {
+      "type": "lognormal",
+      "human_params": [
+        4.8,
+        1.7
+      ],
+      "bot_params": [
+        5.0,
+        1.7
+      ],
+      "evidence": "TwiBot-20 (near-identical)"
+    },
+    "favourites_count": {
+      "type": "lognormal",
+      "human_params": [
+        5.8,
+        2.3
+      ],
+      "bot_params": [
+        5.0,
+        2.5
+      ],
+      "evidence": "TwiBot-22 (heavy overlap)"
+    },
+    "listed_count": {
+      "type": "lognormal",
+      "human_params": [
+        1.3,
+        1.6
+      ],
+      "bot_params": [
+        0.9,
+        1.5
+      ],
+      "evidence": "Cresci 2017 (heavy overlap)"
+    },
+    "default_profile": {
+      "type": "bernoulli",
+      "human_params": [
+        0.2
+      ],
+      "bot_params": [
+        0.3
+      ],
+      "evidence": "TwiBotX 2026 (heavy overlap)"
+    },
+    "default_profile_image": {
+      "type": "bernoulli",
+      "human_params": [
+        0.1
+      ],
+      "bot_params": [
+        0.18
+      ],
+      "evidence": "Cresci 2017 (heavy overlap)"
+    },
+    "has_url": {
+      "type": "bernoulli",
+      "human_params": [
+        0.28
+      ],
+      "bot_params": [
+        0.2
+      ],
+      "evidence": "TwiBotX 2026 (heavy overlap)"
+    },
+    "verified": {
+      "type": "bernoulli",
+      "human_params": [
+        0.02
+      ],
+      "bot_params": [
+        0.003
+      ],
+      "evidence": "TwiBot-22"
+    },
+    "description_length": {
+      "type": "normal",
+      "human_params": [
+        70,
+        45
+      ],
+      "bot_params": [
+        50,
+        45
+      ],
+      "evidence": "TwiBotX 2026 (heavy overlap)"
+    },
+    "screen_name_length": {
+      "type": "normal",
+      "human_params": [
+        10.5,
+        3
+      ],
+      "bot_params": [
+        11.5,
+        3
+      ],
+      "evidence": "Cresci 2017 (heavy overlap)"
+    },
+    "tweets_per_day": {
+      "type": "lognormal",
+      "human_params": [
+        1.0,
+        1.3
+      ],
+      "bot_params": [
+        1.5,
+        1.3
+      ],
+      "evidence": "TwiBot-22 (moderate overlap)"
+    },
+    "retweet_ratio": {
+      "type": "beta",
+      "human_params": [
+        3,
+        4
+      ],
+      "bot_params": [
+        4,
+        3.5
+      ],
+      "evidence": "Cresci 2017 (moderate overlap)"
+    },
+    "reply_ratio": {
+      "type": "beta",
+      "human_params": [
+        2.5,
+        5
+      ],
+      "bot_params": [
+        2,
+        6
+      ],
+      "evidence": "TwiBotX 2026 (moderate overlap)"
+    },
+    "mention_count_avg": {
+      "type": "exponential",
+      "human_params": [
+        1.3
+      ],
+      "bot_params": [
+        1.6
+      ],
+      "evidence": "TwiBot-20 (heavy overlap)"
+    },
+    "hashtag_count_avg": {
+      "type": "exponential",
+      "human_params": [
+        0.9
+      ],
+      "bot_params": [
+        1.2
+      ],
+      "evidence": "Cresci 2017 (heavy overlap)"
+    },
+    "url_share_ratio": {
+      "type": "beta",
+      "human_params": [
+        2,
+        6
+      ],
+      "bot_params": [
+        2.5,
+        5
+      ],
+      "evidence": "TwiBotX 2026 (heavy overlap)"
+    },
+    "posting_regularity": {
+      "type": "beta",
+      "human_params": [
+        3,
+        3.5
+      ],
+      "bot_params": [
+        4,
+        2.5
+      ],
+      "evidence": "Hays 2025 (moderate overlap)"
+    },
+    "night_post_ratio": {
+      "type": "beta",
+      "human_params": [
+        2.5,
+        7
+      ],
+      "bot_params": [
+        3,
+        5.5
+      ],
+      "evidence": "Hays 2025 (moderate overlap)"
+    },
+    "weekend_ratio": {
+      "type": "normal",
+      "human_params": [
+        0.28,
+        0.08
+      ],
+      "bot_params": [
+        0.29,
+        0.07
+      ],
+      "evidence": "TwiBot-22 (near-identical)"
+    },
+    "burst_score": {
+      "type": "lognormal",
+      "human_params": [
+        0.5,
+        0.7
+      ],
+      "bot_params": [
+        0.8,
+        0.8
+      ],
+      "evidence": "Cresci 2017 (moderate overlap)"
+    },
+    "avg_tweet_length": {
+      "type": "normal",
+      "human_params": [
+        110,
+        45
+      ],
+      "bot_params": [
+        95,
+        42
+      ],
+      "evidence": "TwiBotX 2026 (heavy overlap)"
+    },
+    "vocabulary_richness": {
+      "type": "beta",
+      "human_params": [
+        4,
+        3.5
+      ],
+      "bot_params": [
+        3.5,
+        4
+      ],
+      "evidence": "MDPI 2026 (heavy overlap)"
+    },
+    "text_entropy": {
+      "type": "normal",
+      "human_params": [
+        3.9,
+        0.7
+      ],
+      "bot_params": [
+        3.6,
+        0.8
+      ],
+      "evidence": "TwiBotX 2026 (heavy overlap)"
+    },
+    "emoji_ratio": {
+      "type": "exponential",
+      "human_params": [
+        0.022
+      ],
+      "bot_params": [
+        0.018
+      ],
+      "evidence": "TwiBot-22 (near-identical)"
+    },
+    "caps_ratio": {
+      "type": "beta",
+      "human_params": [
+        1.5,
+        14
+      ],
+      "bot_params": [
+        1.6,
+        13
+      ],
+      "evidence": "TwiBotX 2026 (near-identical)"
+    },
+    "content_similarity": {
+      "type": "beta",
+      "human_params": [
+        2.5,
+        5
+      ],
+      "bot_params": [
+        3,
+        4
+      ],
+      "evidence": "Cresci 2017 (moderate overlap)"
+    },
+    "follower_friend_ratio": {
+      "type": "lognormal",
+      "human_params": [
+        0.0,
+        1.3
+      ],
+      "bot_params": [
+        -0.3,
+        1.4
+      ],
+      "evidence": "Cresci 2017 (heavy overlap)"
+    },
+    "reputation_score": {
+      "type": "beta",
+      "human_params": [
+        3,
+        3.5
+      ],
+      "bot_params": [
+        2.5,
+        4
+      ],
+      "evidence": "TwiBot-20 (heavy overlap)"
+    }
+  },
+  "references": [
+    "Cresci, S., et al. (2017). The paradigm-shift of social spambots. WWW.",
+    "Yang, K.-C., et al. (2020). Scalable and Generalizable Social Bot Detection. AAAI. (TwiBot-20)",
+    "Feng, S., et al. (2022). TwiBot-22: Towards Graph-Based Twitter Bot Detection. NeurIPS.",
+    "Hays, C., et al. (2025). Bots Don't Sit Still: A Longitudinal Study. arXiv.",
+    "BotEvo (2026). LLM-Driven Social Bot Detection via Behavioral Evolution. Springer.",
+    "TwiBotX (2026). Interpretable ML with SHAP. Springer.",
+    "MDPI (2026). Explainable Feature-Based Approach for Social Bots."
+  ],
+  "license": "CC BY 4.0"
+}
