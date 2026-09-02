@@ -271,7 +271,8 @@ def extract_tweet_features(tweets, user_features):
 
         # Behavioral features from tweet metadata
         if "retweeted_status_id" in group.columns:
-            row["retweet_ratio"] = group["retweeted_status_id"].notna().mean() if n > 0 else 0.0
+            rt_col = pd.to_numeric(group["retweeted_status_id"], errors="coerce").fillna(0)
+            row["retweet_ratio"] = (rt_col > 0).mean() if n > 0 else 0.0
         elif "retweeted" in group.columns:
             rt = group["retweeted"].apply(
                 lambda x: 1 if str(x).strip().lower() in ("true", "1") else 0

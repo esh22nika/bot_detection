@@ -1,0 +1,31 @@
+feature,dist_type,human_params,bot_params,ks_fit_human,ks_fit_bot,ks_human_vs_bot,overlap
+account_age_days,lognormal,"(7.54, 0.37)","(7.42, 0.32)",0.0622,0.1946,0.263,moderate overlap
+statuses_count,lognormal,"(8.55, 1.82)","(4.03, 2.08)",0.0567,0.2018,0.7985,distinct
+followers_count,lognormal,"(5.83, 1.45)","(3.32, 2.17)",0.0391,0.181,0.6155,distinct
+friends_count,lognormal,"(5.78, 1.11)","(5.26, 1.45)",0.032,0.215,0.3415,moderate overlap
+favourites_count,lognormal,"(6.91, 2.14)","(1.36, 1.81)",0.0521,0.8982,0.944,distinct
+listed_count,lognormal,"(1.69, 1.45)","(1.63, 1.34)",0.3069,0.6854,0.425,distinct
+default_profile,bernoulli,"(0.0,)","(0.0,)",0.0,0.0,0.0,near-identical
+default_profile_image,bernoulli,"(0.0,)","(0.0,)",0.0,0.0,0.0,near-identical
+has_url,bernoulli,"(0.3644,)","(0.2151,)",0.015,0.007,0.1545,heavy overlap
+verified,bernoulli,"(0.0,)","(0.0,)",0.0,0.0,0.0,near-identical
+description_length,normal,"(63.8, 50.9)","(43.7, 53.2)",0.1249,0.2864,0.3825,distinct
+screen_name_length,normal,"(10.9, 2.5)","(12.1, 2.2)",0.0953,0.135,0.2385,moderate overlap
+tweets_per_day,lognormal,"(1.0, 1.74)","(-3.24, 2.08)",0.0584,0.2056,0.793,distinct
+retweet_ratio,beta,"(np.float64(1.27), np.float64(3.62))","(0.5, np.float64(6.52))",0.0397,0.866,0.9256,distinct
+reply_ratio,beta,"(np.float64(1.63), np.float64(4.19))","(np.float64(1.21), np.float64(2.77))",0.0572,0.5326,0.5224,distinct
+mention_count_avg,lognormal,"(-0.34, 0.55)","(-1.91, 1.64)",0.1496,0.3198,0.798,distinct
+hashtag_count_avg,lognormal,"(-2.0, 1.21)","(-2.25, 0.81)",0.0729,0.1736,0.2577,moderate overlap
+url_share_ratio,beta,"(np.float64(1.35), np.float64(3.63))","(0.5, np.float64(1.39))",0.1163,0.5282,0.6679,distinct
+posting_regularity,beta,"(np.float64(0.71), np.float64(3.9))","(0.5, np.float64(3.1))",0.06,0.446,0.5189,distinct
+night_post_ratio,beta,"(np.float64(2.01), np.float64(4.59))","(np.float64(1.81), np.float64(6.05))",0.0785,0.1902,0.2835,moderate overlap
+weekend_ratio,normal,"(0.3, 0.1)","(0.3, 0.1)",0.2308,0.1704,0.1441,heavy overlap
+burst_score,lognormal,"(-4.43, 0.8)","(-3.01, 1.13)",0.0619,0.1918,0.5782,distinct
+avg_tweet_length,normal,"(73.6, 20.0)","(71.0, 16.5)",0.0646,0.13,0.166,heavy overlap
+vocabulary_richness,beta,"(np.float64(6.07), np.float64(14.64))","(np.float64(2.78), np.float64(1.98))",0.1505,0.1294,0.7446,distinct
+text_entropy,normal,"(4.7, 0.2)","(4.6, 0.3)",0.1902,0.2558,0.5592,distinct
+emoji_ratio,exponential,"(0.0,)","(0.0,)",0.0,0.0,0.0,near-identical
+caps_ratio,beta,"(np.float64(6.93), np.float64(61.94))","(np.float64(4.21), np.float64(44.23))",0.096,0.1692,0.3016,moderate overlap
+content_similarity,beta,"(np.float64(3.57), np.float64(156.15))","(np.float64(1.49), np.float64(58.93))",0.0508,0.1432,0.1997,heavy overlap
+follower_friend_ratio,lognormal,"(0.05, 1.06)","(-1.91, 1.44)",0.1108,0.0926,0.6365,distinct
+reputation_score,beta,"(np.float64(2.49), np.float64(2.4))","(np.float64(0.83), np.float64(3.27))",0.0918,0.1252,0.6365,distinct

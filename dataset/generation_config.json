@@ -1,8 +1,8 @@
 {
   "dataset_name": "BotDriftBench",
-  "version": "0.1.0",
-  "description": "A controlled, reproducible benchmark for evaluating social-bot detection under parameterized behavioral shifts. Features are calibrated against published bot detection research. Each account is a longitudinal trajectory with Markov state carry-forward.",
-  "generated_at": "2026-09-01T22:33:16.039842",
+  "version": "0.2.0",
+  "description": "A controlled, reproducible benchmark for evaluating social-bot detection under parameterized behavioral shifts. Feature distributions are empirically calibrated from Cresci-2017 (14,368 accounts, 6.6M tweets). Each account is a longitudinal trajectory with Markov state carry-forward.",
+  "generated_at": "2026-09-02T06:16:44.422556",
   "parameters": {
     "seed": 42,
     "n_accounts": 1000,
@@ -199,74 +199,74 @@
     "account_age_days": {
       "type": "lognormal",
       "human_params": [
-        6.5,
-        1.1
+        7.54,
+        0.37
       ],
       "bot_params": [
-        6.0,
-        1.3
+        7.42,
+        0.32
       ],
-      "evidence": "Cresci 2017 (heavy overlap)"
+      "evidence": "Cresci 2017 (moderate overlap)"
     },
     "statuses_count": {
       "type": "lognormal",
       "human_params": [
-        7.5,
-        1.7
+        8.55,
+        1.82
       ],
       "bot_params": [
-        7.6,
-        1.8
+        4.03,
+        2.08
       ],
-      "evidence": "TwiBot-22 (near-identical)"
+      "evidence": "Cresci 2017 (distinct)"
     },
     "followers_count": {
       "type": "lognormal",
       "human_params": [
-        4.5,
-        2.2
+        5.83,
+        1.45
       ],
       "bot_params": [
-        4.0,
-        2.3
+        3.32,
+        2.17
       ],
-      "evidence": "Cresci 2017 (heavy overlap)"
+      "evidence": "Cresci 2017 (distinct)"
     },
     "friends_count": {
       "type": "lognormal",
       "human_params": [
-        4.8,
-        1.7
+        5.78,
+        1.11
       ],
       "bot_params": [
-        5.0,
-        1.7
+        5.26,
+        1.45
       ],
-      "evidence": "TwiBot-20 (near-identical)"
+      "evidence": "Cresci 2017 (moderate overlap)"
     },
     "favourites_count": {
       "type": "lognormal",
       "human_params": [
-        5.8,
-        2.3
+        6.91,
+        2.14
       ],
       "bot_params": [
-        5.0,
-        2.5
+        1.36,
+        1.81
       ],
-      "evidence": "TwiBot-22 (heavy overlap)"
+      "evidence": "Cresci 2017 (distinct)"
     },
     "listed_count": {
       "type": "lognormal",
       "human_params": [
-        1.3,
-        1.6
+        1.69,
+        1.45
       ],
       "bot_params": [
-        0.9,
-        1.5
+        1.63,
+        1.34
       ],
-      "evidence": "Cresci 2017 (heavy overlap)"
+      "evidence": "Cresci 2017 (distinct)"
     },
     "default_profile": {
       "type": "bernoulli",
@@ -291,12 +291,12 @@
     "has_url": {
       "type": "bernoulli",
       "human_params": [
-        0.28
+        0.3644
       ],
       "bot_params": [
-        0.2
+        0.2151
       ],
-      "evidence": "TwiBotX 2026 (heavy overlap)"
+      "evidence": "Cresci 2017 (heavy overlap)"
     },
     "verified": {
       "type": "bernoulli",
@@ -311,178 +311,182 @@
     "description_length": {
       "type": "normal",
       "human_params": [
-        70,
-        45
+        63.8,
+        50.9
       ],
       "bot_params": [
-        50,
-        45
+        43.7,
+        53.2
       ],
-      "evidence": "TwiBotX 2026 (heavy overlap)"
+      "evidence": "Cresci 2017 (distinct)"
     },
     "screen_name_length": {
       "type": "normal",
       "human_params": [
-        10.5,
-        3
+        10.9,
+        2.5
       ],
       "bot_params": [
-        11.5,
-        3
+        12.1,
+        2.2
       ],
-      "evidence": "Cresci 2017 (heavy overlap)"
+      "evidence": "Cresci 2017 (moderate overlap)"
     },
     "tweets_per_day": {
       "type": "lognormal",
       "human_params": [
         1.0,
-        1.3
+        1.74
       ],
       "bot_params": [
-        1.5,
-        1.3
+        -3.24,
+        2.08
       ],
-      "evidence": "TwiBot-22 (moderate overlap)"
+      "evidence": "Cresci 2017 (distinct)"
     },
     "retweet_ratio": {
       "type": "beta",
       "human_params": [
-        3,
-        4
+        1.27,
+        3.62
       ],
       "bot_params": [
-        4,
-        3.5
+        0.5,
+        6.52
       ],
-      "evidence": "Cresci 2017 (moderate overlap)"
+      "evidence": "Cresci 2017 (distinct)"
     },
     "reply_ratio": {
       "type": "beta",
       "human_params": [
-        2.5,
-        5
+        1.63,
+        4.19
       ],
       "bot_params": [
-        2,
-        6
+        1.21,
+        2.77
       ],
-      "evidence": "TwiBotX 2026 (moderate overlap)"
+      "evidence": "Cresci 2017 (distinct)"
     },
     "mention_count_avg": {
-      "type": "exponential",
+      "type": "lognormal",
       "human_params": [
-        1.3
+        -0.34,
+        0.55
       ],
       "bot_params": [
-        1.6
+        -1.91,
+        1.64
       ],
-      "evidence": "TwiBot-20 (heavy overlap)"
+      "evidence": "Cresci 2017 (distinct)"
     },
     "hashtag_count_avg": {
-      "type": "exponential",
+      "type": "lognormal",
       "human_params": [
-        0.9
+        -2.0,
+        1.21
       ],
       "bot_params": [
-        1.2
+        -2.25,
+        0.81
       ],
-      "evidence": "Cresci 2017 (heavy overlap)"
+      "evidence": "Cresci 2017 (moderate overlap)"
     },
     "url_share_ratio": {
       "type": "beta",
       "human_params": [
-        2,
-        6
+        1.35,
+        3.63
       ],
       "bot_params": [
-        2.5,
-        5
+        0.5,
+        1.39
       ],
-      "evidence": "TwiBotX 2026 (heavy overlap)"
+      "evidence": "Cresci 2017 (distinct)"
     },
     "posting_regularity": {
       "type": "beta",
       "human_params": [
-        3,
-        3.5
+        0.71,
+        3.9
       ],
       "bot_params": [
-        4,
-        2.5
+        0.5,
+        3.1
       ],
-      "evidence": "Hays 2025 (moderate overlap)"
+      "evidence": "Cresci 2017 (distinct)"
     },
     "night_post_ratio": {
       "type": "beta",
       "human_params": [
-        2.5,
-        7
+        2.01,
+        4.59
       ],
       "bot_params": [
-        3,
-        5.5
+        1.81,
+        6.05
       ],
-      "evidence": "Hays 2025 (moderate overlap)"
+      "evidence": "Cresci 2017 (moderate overlap)"
     },
     "weekend_ratio": {
       "type": "normal",
       "human_params": [
-        0.28,
-        0.08
+        0.3,
+        0.1
       ],
       "bot_params": [
-        0.29,
-        0.07
+        0.3,
+        0.1
       ],
-      "evidence": "TwiBot-22 (near-identical)"
+      "evidence": "Cresci 2017 (heavy overlap)"
     },
     "burst_score": {
       "type": "lognormal",
       "human_params": [
-        0.5,
-        0.7
-      ],
-      "bot_params": [
-        0.8,
+        -4.43,
         0.8
       ],
-      "evidence": "Cresci 2017 (moderate overlap)"
+      "bot_params": [
+        -3.01,
+        1.13
+      ],
+      "evidence": "Cresci 2017 (distinct)"
     },
     "avg_tweet_length": {
       "type": "normal",
       "human_params": [
-        110,
-        45
+        73.6,
+        20.0
       ],
       "bot_params": [
-        95,
-        42
+        71.0,
+        16.5
       ],
-      "evidence": "TwiBotX 2026 (heavy overlap)"
+      "evidence": "Cresci 2017 (heavy overlap)"
     },
     "vocabulary_richness": {
       "type": "beta",
       "human_params": [
-        4,
-        3.5
+        6.07,
+        14.64
       ],
       "bot_params": [
-        3.5,
-        4
+        2.78,
+        1.98
       ],
-      "evidence": "MDPI 2026 (heavy overlap)"
+      "evidence": "Cresci 2017 (distinct)"
     },
     "text_entropy": {
       "type": "normal",
       "human_params": [
-        3.9,
-        0.7
+        4.7,
+        0.2
       ],
       "bot_params": [
-        3.6,
-        0.8
+        4.6,
+        0.3
       ],
-      "evidence": "TwiBotX 2026 (heavy overlap)"
+      "evidence": "Cresci 2017 (distinct)"
     },
     "emoji_ratio": {
       "type": "exponential",
@@ -497,50 +501,50 @@
     "caps_ratio": {
       "type": "beta",
       "human_params": [
-        1.5,
-        14
+        6.93,
+        61.94
       ],
       "bot_params": [
-        1.6,
-        13
+        4.21,
+        44.23
       ],
-      "evidence": "TwiBotX 2026 (near-identical)"
+      "evidence": "Cresci 2017 (moderate overlap)"
     },
     "content_similarity": {
       "type": "beta",
       "human_params": [
-        2.5,
-        5
+        3.57,
+        156.15
       ],
       "bot_params": [
-        3,
-        4
+        1.49,
+        58.93
       ],
-      "evidence": "Cresci 2017 (moderate overlap)"
+      "evidence": "Cresci 2017 (heavy overlap)"
     },
     "follower_friend_ratio": {
       "type": "lognormal",
       "human_params": [
-        0.0,
-        1.3
+        0.05,
+        1.06
       ],
       "bot_params": [
-        -0.3,
-        1.4
+        -1.91,
+        1.44
       ],
-      "evidence": "Cresci 2017 (heavy overlap)"
+      "evidence": "Cresci 2017 (distinct)"
     },
     "reputation_score": {
       "type": "beta",
       "human_params": [
-        3,
-        3.5
+        2.49,
+        2.4
       ],
       "bot_params": [
-        2.5,
-        4
+        0.83,
+        3.27
       ],
-      "evidence": "TwiBot-20 (heavy overlap)"
+      "evidence": "Cresci 2017 (distinct)"
     }
   },
   "references": [

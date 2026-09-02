@@ -1,5 +1,5 @@
 """
-BotDriftBench v0.1 — Drift Injection Benchmark for Social Bot Detection
+BotDriftBench v0.2 — Drift Injection Benchmark for Social Bot Detection
 ========================================================================
 
 Generates longitudinal synthetic account trajectories with mathematically
@@ -34,7 +34,7 @@ Mathematical framework:
     δ ∈ {0.1, 0.25, 0.5, 1.0} × base_drift_vector
 
 Usage:
-    python generate_dataset.py                          # v0.1: 1000 accounts
+    python generate_dataset.py                          # v0.2: 1000 accounts
     python generate_dataset.py --accounts 10000         # full scale
     python generate_dataset.py --drift-magnitude 0.5    # weaker drift
     python generate_dataset.py --drift-magnitude 2.0    # stronger drift
@@ -118,43 +118,40 @@ NON_NEGATIVE = {
 # ═══════════════════════════════════════════════════════════════════════════
 
 INIT_DISTRIBUTIONS = {
-    # --- Profile ---
-    # Many profile features are near-identical: modern bots invest in profiles
-    "account_age_days":      ("lognormal", (6.5, 1.1),  (6.0, 1.3),  "Cresci 2017 (heavy overlap)"),
-    "statuses_count":        ("lognormal", (7.5, 1.7),  (7.6, 1.8),  "TwiBot-22 (near-identical)"),
-    "followers_count":       ("lognormal", (4.5, 2.2),  (4.0, 2.3),  "Cresci 2017 (heavy overlap)"),
-    "friends_count":         ("lognormal", (4.8, 1.7),  (5.0, 1.7),  "TwiBot-20 (near-identical)"),
-    "favourites_count":      ("lognormal", (5.8, 2.3),  (5.0, 2.5),  "TwiBot-22 (heavy overlap)"),
-    "listed_count":          ("lognormal", (1.3, 1.6),  (0.9, 1.5),  "Cresci 2017 (heavy overlap)"),
-    "default_profile":       ("bernoulli", (0.20,),     (0.30,),     "TwiBotX 2026 (heavy overlap)"),
-    "default_profile_image": ("bernoulli", (0.10,),     (0.18,),     "Cresci 2017 (heavy overlap)"),
-    "has_url":               ("bernoulli", (0.28,),     (0.20,),     "TwiBotX 2026 (heavy overlap)"),
-    "verified":              ("bernoulli", (0.02,),     (0.003,),    "TwiBot-22"),
-    "description_length":    ("normal",    (70, 45),    (50, 45),    "TwiBotX 2026 (heavy overlap)"),
-    "screen_name_length":    ("normal",    (10.5, 3),   (11.5, 3),   "Cresci 2017 (heavy overlap)"),
-    # --- Behavioral ---
-    # Key discriminators — moderate overlap (not trivial, not impossible)
-    "tweets_per_day":        ("lognormal", (1.0, 1.3),  (1.5, 1.3),  "TwiBot-22 (moderate overlap)"),
-    "retweet_ratio":         ("beta",      (3, 4),      (4, 3.5),    "Cresci 2017 (moderate overlap)"),
-    "reply_ratio":           ("beta",      (2.5, 5),    (2, 6),      "TwiBotX 2026 (moderate overlap)"),
-    "mention_count_avg":     ("exponential", (1.3,),    (1.6,),      "TwiBot-20 (heavy overlap)"),
-    "hashtag_count_avg":     ("exponential", (0.9,),    (1.2,),      "Cresci 2017 (heavy overlap)"),
-    "url_share_ratio":       ("beta",      (2, 6),      (2.5, 5),    "TwiBotX 2026 (heavy overlap)"),
-    "posting_regularity":    ("beta",      (3, 3.5),    (4, 2.5),    "Hays 2025 (moderate overlap)"),
-    "night_post_ratio":      ("beta",      (2.5, 7),    (3, 5.5),    "Hays 2025 (moderate overlap)"),
-    "weekend_ratio":         ("normal",    (0.28, 0.08),(0.29, 0.07),"TwiBot-22 (near-identical)"),
-    "burst_score":           ("lognormal", (0.5, 0.7),  (0.8, 0.8),  "Cresci 2017 (moderate overlap)"),
-    # --- Content ---
-    # LLM-era bots produce near-human text quality
-    "avg_tweet_length":      ("normal",    (110, 45),   (95, 42),    "TwiBotX 2026 (heavy overlap)"),
-    "vocabulary_richness":   ("beta",      (4, 3.5),    (3.5, 4),    "MDPI 2026 (heavy overlap)"),
-    "text_entropy":          ("normal",    (3.9, 0.7),  (3.6, 0.8),  "TwiBotX 2026 (heavy overlap)"),
-    "emoji_ratio":           ("exponential", (0.022,),  (0.018,),    "TwiBot-22 (near-identical)"),
-    "caps_ratio":            ("beta",      (1.5, 14),   (1.6, 13),   "TwiBotX 2026 (near-identical)"),
-    "content_similarity":    ("beta",      (2.5, 5),    (3, 4),      "Cresci 2017 (moderate overlap)"),
-    # --- Network ---
-    "follower_friend_ratio": ("lognormal", (0.0, 1.3),  (-0.3, 1.4), "Cresci 2017 (heavy overlap)"),
-    "reputation_score":      ("beta",      (3, 3.5),    (2.5, 4),    "TwiBot-20 (heavy overlap)"),
+    # --- Profile --- (calibrated from Cresci-2017 empirical fits)
+    "account_age_days":      ("lognormal", (7.54, 0.37), (7.42, 0.32), "Cresci 2017 (moderate overlap)"),
+    "statuses_count":        ("lognormal", (8.55, 1.82), (4.03, 2.08), "Cresci 2017 (distinct)"),
+    "followers_count":       ("lognormal", (5.83, 1.45), (3.32, 2.17), "Cresci 2017 (distinct)"),
+    "friends_count":         ("lognormal", (5.78, 1.11), (5.26, 1.45), "Cresci 2017 (moderate overlap)"),
+    "favourites_count":      ("lognormal", (6.91, 2.14), (1.36, 1.81), "Cresci 2017 (distinct)"),
+    "listed_count":          ("lognormal", (1.69, 1.45), (1.63, 1.34), "Cresci 2017 (distinct)"),
+    "default_profile":       ("bernoulli", (0.20,),      (0.30,),      "TwiBotX 2026 (heavy overlap)"),
+    "default_profile_image": ("bernoulli", (0.10,),      (0.18,),      "Cresci 2017 (heavy overlap)"),
+    "has_url":               ("bernoulli", (0.3644,),    (0.2151,),    "Cresci 2017 (heavy overlap)"),
+    "verified":              ("bernoulli", (0.02,),      (0.003,),     "TwiBot-22"),
+    "description_length":    ("normal",    (63.8, 50.9), (43.7, 53.2), "Cresci 2017 (distinct)"),
+    "screen_name_length":    ("normal",    (10.9, 2.5),  (12.1, 2.2),  "Cresci 2017 (moderate overlap)"),
+    # --- Behavioral --- (calibrated from Cresci-2017 empirical fits)
+    "tweets_per_day":        ("lognormal", (1.0, 1.74),  (-3.24, 2.08),"Cresci 2017 (distinct)"),
+    "retweet_ratio":         ("beta",      (1.27, 3.62), (0.5, 6.52),  "Cresci 2017 (distinct)"),
+    "reply_ratio":           ("beta",      (1.63, 4.19), (1.21, 2.77), "Cresci 2017 (distinct)"),
+    "mention_count_avg":     ("lognormal", (-0.34, 0.55),(-1.91, 1.64),"Cresci 2017 (distinct)"),
+    "hashtag_count_avg":     ("lognormal", (-2.0, 1.21), (-2.25, 0.81),"Cresci 2017 (moderate overlap)"),
+    "url_share_ratio":       ("beta",      (1.35, 3.63), (0.5, 1.39),  "Cresci 2017 (distinct)"),
+    "posting_regularity":    ("beta",      (0.71, 3.9),  (0.5, 3.1),   "Cresci 2017 (distinct)"),
+    "night_post_ratio":      ("beta",      (2.01, 4.59), (1.81, 6.05), "Cresci 2017 (moderate overlap)"),
+    "weekend_ratio":         ("normal",    (0.3, 0.1),   (0.3, 0.1),   "Cresci 2017 (heavy overlap)"),
+    "burst_score":           ("lognormal", (-4.43, 0.8), (-3.01, 1.13),"Cresci 2017 (distinct)"),
+    # --- Content --- (calibrated from Cresci-2017 empirical fits)
+    "avg_tweet_length":      ("normal",    (73.6, 20.0), (71.0, 16.5), "Cresci 2017 (heavy overlap)"),
+    "vocabulary_richness":   ("beta",      (6.07, 14.64),(2.78, 1.98), "Cresci 2017 (distinct)"),
+    "text_entropy":          ("normal",    (4.7, 0.2),   (4.6, 0.3),   "Cresci 2017 (distinct)"),
+    "emoji_ratio":           ("exponential", (0.022,),   (0.018,),     "TwiBot-22 (near-identical)"),
+    "caps_ratio":            ("beta",      (6.93, 61.94),(4.21, 44.23),"Cresci 2017 (moderate overlap)"),
+    "content_similarity":    ("beta",      (3.57, 156.15),(1.49, 58.93),"Cresci 2017 (heavy overlap)"),
+    # --- Network --- (calibrated from Cresci-2017 empirical fits)
+    "follower_friend_ratio": ("lognormal", (0.05, 1.06), (-1.91, 1.44),"Cresci 2017 (distinct)"),
+    "reputation_score":      ("beta",      (2.49, 2.4),  (0.83, 3.27), "Cresci 2017 (distinct)"),
 }
 
 
@@ -199,9 +196,9 @@ HUMAN_ARCHETYPES = {
             "statuses_count": ("multiply", 0.2),
             "reply_ratio": ("add", -0.05),
             "retweet_ratio": ("add", 0.08),
-            "posting_regularity": ("add", -0.15),
-            "burst_score": ("add", -0.3),
-            "content_similarity": ("add", -0.05),
+            "posting_regularity": ("multiply", 0.3),
+            "burst_score": ("multiply", 0.5),
+            "content_similarity": ("multiply", 0.5),
         },
     },
     "new_account": {
@@ -243,7 +240,7 @@ BOT_ARCHETYPES = {
             "tweets_per_day": ("multiply", 4.0),
             "url_share_ratio": ("add", 0.20),
             "hashtag_count_avg": ("add", 1.5),
-            "content_similarity": ("add", 0.20),
+            "content_similarity": ("multiply", 8.0),
             "posting_regularity": ("add", 0.15),
             "burst_score": ("multiply", 2.0),
             "vocabulary_richness": ("add", -0.10),
@@ -257,7 +254,7 @@ BOT_ARCHETYPES = {
             "mention_count_avg": ("add", 0.5),
             "vocabulary_richness": ("add", 0.05),
             "text_entropy": ("add", 0.2),
-            "content_similarity": ("add", -0.10),
+            "content_similarity": ("multiply", 0.5),
             "default_profile": ("set_prob", 0.15),
             "default_profile_image": ("set_prob", 0.10),
             "description_length": ("add", 25),
@@ -272,9 +269,9 @@ BOT_ARCHETYPES = {
             "friends_count": ("multiply", 3.0),
             "followers_count": ("multiply", 0.05),
             "retweet_ratio": ("add", 0.10),
-            "posting_regularity": ("add", -0.10),
-            "content_similarity": ("add", 0.10),
-            "burst_score": ("add", -0.5),
+            "posting_regularity": ("multiply", 0.3),
+            "content_similarity": ("multiply", 4.0),
+            "burst_score": ("multiply", 0.3),
         },
     },
     "political_bot": {
@@ -284,7 +281,7 @@ BOT_ARCHETYPES = {
             "retweet_ratio": ("add", 0.15),
             "mention_count_avg": ("add", 1.0),
             "night_post_ratio": ("add", 0.05),
-            "content_similarity": ("add", 0.10),
+            "content_similarity": ("multiply", 4.0),
             "burst_score": ("multiply", 1.5),
         },
     },
@@ -293,9 +290,9 @@ BOT_ARCHETYPES = {
         "modifiers": {
             "vocabulary_richness": ("add", 0.15),
             "text_entropy": ("add", 0.5),
-            "content_similarity": ("add", -0.20),
+            "content_similarity": ("multiply", 0.3),
             "reply_ratio": ("add", 0.12),
-            "posting_regularity": ("add", -0.25),
+            "posting_regularity": ("multiply", 0.2),
             "night_post_ratio": ("add", -0.12),
             "burst_score": ("multiply", 0.4),
             "default_profile": ("set_prob", 0.08),
@@ -307,7 +304,7 @@ BOT_ARCHETYPES = {
             "reputation_score": ("add", 0.15),
             "tweets_per_day": ("multiply", 0.3),
             "retweet_ratio": ("add", -0.10),
-            "hashtag_count_avg": ("add", -0.3),
+            "hashtag_count_avg": ("multiply", 0.5),
         },
     },
 }
@@ -564,7 +561,7 @@ def clip_feature(values, feat_name):
     if feat_name == "tweets_per_day":
         np.maximum(values, 0.01, out=values)
     elif feat_name == "burst_score":
-        np.maximum(values, 1.0, out=values)
+        np.maximum(values, 0.001, out=values)
     elif feat_name == "screen_name_length":
         np.maximum(values, 3.0, out=values)
     elif feat_name == "text_entropy":
@@ -891,7 +888,7 @@ def save_all(df, scenarios, output_dir, args):
     os.makedirs(output_dir, exist_ok=True)
 
     # Main dataset
-    main_path = os.path.join(output_dir, "botdriftbench_v0.1.csv")
+    main_path = os.path.join(output_dir, "botdriftbench_v0.2.csv")
     df.to_csv(main_path, index=False)
     size_mb = os.path.getsize(main_path) / 1e6
     print(f"\nSaved: {main_path} ({size_mb:.1f} MB)")
@@ -935,12 +932,12 @@ def save_all(df, scenarios, output_dir, args):
     # Generation config
     config = {
         "dataset_name": "BotDriftBench",
-        "version": "0.1.0",
+        "version": "0.2.0",
         "description": (
             "A controlled, reproducible benchmark for evaluating social-bot "
-            "detection under parameterized behavioral shifts. Features are "
-            "calibrated against published bot detection research. Each account "
-            "is a longitudinal trajectory with Markov state carry-forward."
+            "detection under parameterized behavioral shifts. Feature distributions "
+            "are empirically calibrated from Cresci-2017 (14,368 accounts, 6.6M tweets). "
+            "Each account is a longitudinal trajectory with Markov state carry-forward."
         ),
         "generated_at": datetime.now().isoformat(),
         "parameters": {
@@ -1022,7 +1019,7 @@ def main():
     )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--accounts", type=int, default=1000,
-                        help="Total accounts (default: 1000 for v0.1)")
+                        help="Total accounts (default: 1000 for v0.2)")
     parser.add_argument("--windows", type=int, default=20)
     parser.add_argument("--drift-magnitude", type=float, default=1.0,
                         help="Drift magnitude multiplier (0.1=subtle, 1.0=standard, 2.0=strong)")
@@ -1034,7 +1031,7 @@ def main():
     args = parser.parse_args()
 
     print("=" * 65)
-    print("BotDriftBench v0.1 — Dataset Generator")
+    print("BotDriftBench v0.2 — Dataset Generator")
     print("=" * 65)
     print(f"  Seed:            {args.seed}")
     print(f"  Accounts:        {args.accounts:,}")
