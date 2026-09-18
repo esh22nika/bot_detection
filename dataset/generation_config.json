@@ -2,7 +2,7 @@
   "dataset_name": "BotDriftBench",
   "version": "0.2.0",
   "description": "A controlled, reproducible benchmark for evaluating social-bot detection under parameterized behavioral shifts. Feature distributions are empirically calibrated from Cresci-2017 (14,368 accounts, 6.6M tweets). Each account is a longitudinal trajectory with Markov state carry-forward.",
-  "generated_at": "2026-09-02T06:16:44.422556",
+  "generated_at": "2026-09-14T00:59:35.142034",
   "parameters": {
     "seed": 42,
     "n_accounts": 1000,

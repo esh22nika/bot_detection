@@ -117,6 +117,13 @@ NON_NEGATIVE = {
 # Each entry: (distribution_type, params_human, params_bot, evidence)
 # ═══════════════════════════════════════════════════════════════════════════
 
+# Cresci-2017 bots (2017-era) are trivially separable on many features.
+# Modern bots have converged toward human behavior. This factor blends
+# bot distribution parameters toward human values to model that evolution.
+# 0.0 = raw Cresci-2017 (trivially separable, F1>0.999)
+# 1.0 = bots indistinguishable from humans
+SOPHISTICATION_FACTOR = 0.6
+
 INIT_DISTRIBUTIONS = {
     # --- Profile --- (calibrated from Cresci-2017 empirical fits)
     "account_age_days":      ("lognormal", (7.54, 0.37), (7.42, 0.32), "Cresci 2017 (moderate overlap)"),
@@ -311,20 +318,30 @@ BOT_ARCHETYPES = {
 
 
 def sample_initial(feat_name, label, n, rng):
-    """Sample n initial values for a feature given the label."""
+    """Sample n initial values for a feature given the label.
+
+    For bots, applies SOPHISTICATION_FACTOR to blend parameters toward
+    human distributions, representing post-2017 bot evolution.
+    """
     dist_type, h_params, b_params, _ = INIT_DISTRIBUTIONS[feat_name]
-    params = h_params if label == "human" else b_params
+
+    if label == "human":
+        params = h_params
+    else:
+        sf = SOPHISTICATION_FACTOR
+        params = tuple(b + sf * (h - b) for b, h in zip(b_params, h_params))
 
     if dist_type == "lognormal":
-        return rng.lognormal(params[0], params[1], n)
+        return rng.lognormal(params[0], max(0.1, params[1]), n)
     elif dist_type == "normal":
-        return rng.normal(params[0], params[1], n)
+        return rng.normal(params[0], max(0.1, params[1]), n)
     elif dist_type == "beta":
-        return rng.beta(params[0], params[1], n)
+        return rng.beta(max(0.1, params[0]), max(0.1, params[1]), n)
     elif dist_type == "exponential":
-        return rng.exponential(params[0], n)
+        return rng.exponential(max(0.001, params[0]), n)
     elif dist_type == "bernoulli":
-        return (rng.random(n) < params[0]).astype(float)
+        p = max(0.001, min(0.999, params[0]))
+        return (rng.random(n) < p).astype(float)
     raise ValueError(f"Unknown distribution: {dist_type}")
 
 
@@ -379,7 +396,7 @@ NATURAL_EVOLUTION = {
     "default_profile_image": {"human_trend": 0.0,   "bot_trend": 0.0,   "noise_scale": 0.0},
     "has_url":               {"human_trend": 0.0,   "bot_trend": 0.0,   "noise_scale": 0.0},
     "verified":              {"human_trend": 0.0,   "bot_trend": 0.0,   "noise_scale": 0.0},
-    "description_length":    {"human_trend": 0.5,   "bot_trend": 0.0,   "noise_scale": 3.0},
+    "description_length":    {"human_trend": 0.5,   "bot_trend": 0.0,   "noise_scale": 0.03},
     "screen_name_length":    {"human_trend": 0.0,   "bot_trend": 0.0,   "noise_scale": 0.0},
     # Behavioral features: moderate variation
     "tweets_per_day":        {"human_trend": 0.0,   "bot_trend": 0.0,   "noise_scale": 0.05},
@@ -393,7 +410,7 @@ NATURAL_EVOLUTION = {
     "weekend_ratio":         {"human_trend": 0.0,   "bot_trend": 0.0,   "noise_scale": 0.01},
     "burst_score":           {"human_trend": 0.0,   "bot_trend": 0.0,   "noise_scale": 0.04},
     # Content features: humans evolve language over time too
-    "avg_tweet_length":      {"human_trend": 0.3,   "bot_trend": 0.0,   "noise_scale": 5.0},
+    "avg_tweet_length":      {"human_trend": 0.3,   "bot_trend": 0.0,   "noise_scale": 0.05},
     "vocabulary_richness":   {"human_trend": 0.001, "bot_trend": 0.0,   "noise_scale": 0.015},
     "text_entropy":          {"human_trend": 0.005, "bot_trend": 0.0,   "noise_scale": 0.04},
     "emoji_ratio":           {"human_trend": 0.001, "bot_trend": 0.0,   "noise_scale": 0.003},
@@ -652,11 +669,11 @@ def generate_trajectories(n_accounts, n_windows, seed, drift_magnitude,
                 # Noise component (proportional for large-scale features,
                 # absolute for bounded features)
                 if feat in BOUNDED_01:
-                    noise = rng.normal(0, noise_scale, n_accounts)
+                    noise = rng.normal(0, noise_scale * 2.0, n_accounts)
                 elif feat in ("account_age_days",):
                     noise = np.zeros(n_accounts)
                 else:
-                    noise = state[feat] * rng.normal(0, noise_scale, n_accounts)
+                    noise = state[feat] * rng.normal(0, noise_scale * 2.0, n_accounts)
 
                 state[feat] += noise
 
@@ -768,9 +785,9 @@ def generate_trajectories(n_accounts, n_windows, seed, drift_magnitude,
             observed = state[feat].copy()
             if feat not in BINARY_FEATURES:
                 if feat in BOUNDED_01:
-                    meas_noise = rng.normal(0, 0.03, n_accounts)
+                    meas_noise = rng.normal(0, 0.08, n_accounts)
                 else:
-                    meas_noise = observed * rng.normal(0, 0.08, n_accounts)
+                    meas_noise = observed * rng.normal(0, 0.15, n_accounts)
                 observed = observed + meas_noise
                 observed = clip_feature(observed, feat)
             window_data[feat] = np.round(observed, 6)
