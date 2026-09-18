@@ -1,0 +1,2 @@
+policy,detection_method,ks_threshold,fraction_threshold,global_min_drift_onset,first_detection_window,detection_delay_windows,false_alarms_before_drift,true_detections,missed_detections,number_of_retrains,retrain_windows,average_retraining_interval,performance_before_drift_f1,performance_after_detection_f1,performance_after_detection_auc,performance_after_detection_recall,performance_after_detection_precision
+da_localized,Localized KS on train bot population,0.06,0.2,2,5,3,0,5,0,5,"[5, 8, 11, 14, 17]",3.0,0.977,0.9099,0.9632,0.914,0.9125

@@ -1,0 +1,8 @@
+scenario,n_accounts,pre_drift_f1,post_drift_f1,f1_degradation
+boundary_crossing_evasion,51,1.0,0.2917,0.7083
+abrupt_evasion,38,1.0,0.3098,0.6902
+localized_evasion,27,1.0,0.4515,0.5485
+gradual_evasion,63,0.4899,0.3278,0.1621
+behavioral_gradual,163,0.9826,0.926,0.0566
+recurring_behavior,14,0.451,0.4098,0.0411
+stable_control,244,0.965,0.966,-0.001

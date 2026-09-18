@@ -1,0 +1,175 @@
+{
+  "version": "v0.8",
+  "seed": 2025,
+  "n_accounts": 3000,
+  "n_windows": 20,
+  "n_rows": 60000,
+  "features": [
+    "followers_count",
+    "friends_count",
+    "listed_count",
+    "account_age_days",
+    "description_length",
+    "screen_name_length",
+    "verified_score",
+    "reputation_score",
+    "statuses_count",
+    "tweets_per_day",
+    "posting_regularity",
+    "burst_score",
+    "night_post_ratio",
+    "weekend_post_ratio",
+    "text_entropy",
+    "vocabulary_richness",
+    "content_similarity",
+    "hashtag_count_avg",
+    "url_ratio",
+    "emoji_ratio",
+    "caps_ratio",
+    "reply_ratio",
+    "retweet_ratio",
+    "mention_ratio",
+    "conversation_depth"
+  ],
+  "feature_groups": {
+    "profile": [
+      "followers_count",
+      "friends_count",
+      "listed_count",
+      "account_age_days",
+      "description_length",
+      "screen_name_length",
+      "verified_score",
+      "reputation_score"
+    ],
+    "core_profile": [
+      "account_age_days",
+      "followers_count",
+      "friends_count",
+      "listed_count"
+    ],
+    "activity": [
+      "statuses_count",
+      "tweets_per_day",
+      "posting_regularity",
+      "burst_score",
+      "night_post_ratio",
+      "weekend_post_ratio"
+    ],
+    "content": [
+      "text_entropy",
+      "vocabulary_richness",
+      "content_similarity",
+      "hashtag_count_avg",
+      "url_ratio",
+      "emoji_ratio",
+      "caps_ratio"
+    ],
+    "interaction": [
+      "reply_ratio",
+      "retweet_ratio",
+      "mention_ratio",
+      "conversation_depth"
+    ]
+  },
+  "bot_scenario_probabilities": {
+    "stable_control": 0.13,
+    "behavioral_gradual": 0.17,
+    "gradual_evasion": 0.26,
+    "abrupt_evasion": 0.1,
+    "localized_evasion": 0.08,
+    "recurring_behavior": 0.06,
+    "boundary_crossing_evasion": 0.2
+  },
+  "human_scenario_probabilities": {
+    "stable_control": 0.65,
+    "behavioral_gradual": 0.35
+  },
+  "scenario_to_drift_type": {
+    "stable_control": "none",
+    "behavioral_gradual": "gradual",
+    "gradual_evasion": "gradual",
+    "abrupt_evasion": "abrupt",
+    "localized_evasion": "localized",
+    "recurring_behavior": "recurring",
+    "boundary_crossing_evasion": "concept"
+  },
+  "noise": {
+    "continuous_noise": 0.035,
+    "bounded_noise": 0.018,
+    "evolution_noise": 0.012
+  },
+  "drift": {
+    "min_onset": 2,
+    "max_onset": 14,
+    "min_duration": 2,
+    "max_duration": 7,
+    "min_severity": 0.45,
+    "max_severity": 0.95
+  },
+  "split_policy": {
+    "unit": "account",
+    "train_fraction": 0.6,
+    "validation_fraction": 0.2,
+    "test_fraction": 0.2,
+    "method": "random shuffle of account_id with fixed seed, computed before the human-reference manifold is built; the human reference is derived only from label==0 accounts whose split is 'train'"
+  },
+  "calibration_note": "Synthetic feature distributions inspired by social bot and human behavioral patterns. Human reference manifold estimated from synthetic training-split humans only. Humanization targets are sampled as COMPLETE human rows (preserving cross-feature correlation), not per-feature independent samples.",
+  "mean_feature_shift_caveat": "mean_feature_shift (in window_metadata) is a descriptive per-feature displacement measure, not a calibrated or causal drift-magnitude metric. It can behave oddly for small-baseline, large-count features (e.g. a 1->20 change looks huge; a 10,000->12,000 change looks small despite being operationally larger). Do not use it as ground truth for how 'harmful' drift is.",
+  "important_limitations": [
+    "Synthetic benchmark, not real longitudinal social data.",
+    "Drift scenarios are controlled simulations.",
+    "Results must not be presented as real-world performance.",
+    "External empirical calibration should be reported separately.",
+    "Boundary-crossing validation (pre/post-drift F1 on a trained model) is a separate step that must be run before treating this dataset as containing 'harmful' drift by construction.",
+    "Core profile features (age/followers/friends/listed) evolve via monotonic organic growth only -- never toward a humanization target -- regardless of scenario.",
+    "Do not tune generator parameters against test-set F1, and do not use the test split to choose drift-aware thresholds."
+  ],
+  "validation_checks": {
+    "n_rows": 60000,
+    "n_accounts": 3000,
+    "n_windows": 20,
+    "n_features": 25,
+    "class_balance": {
+      "0": 1500,
+      "1": 1500
+    },
+    "scenario_counts": {
+      "stable_control": 1186,
+      "behavioral_gradual": 759,
+      "gradual_evasion": 355,
+      "boundary_crossing_evasion": 329,
+      "abrupt_evasion": 151,
+      "localized_evasion": 123,
+      "recurring_behavior": 97
+    },
+    "drift_type_counts": {
+      "none": 1186,
+      "gradual": 1114,
+      "concept": 329,
+      "abrupt": 151,
+      "localized": 123,
+      "recurring": 97
+    },
+    "difficulty_tier_counts": {
+      "control": 1186,
+      "medium_hard": 810,
+      "medium": 492,
+      "hard": 370,
+      "easy": 142
+    },
+    "split_account_counts": {
+      "train": 1800,
+      "test": 600,
+      "validation": 600
+    },
+    "drifting_account_count": 1814,
+    "stable_account_count": 1186,
+    "accounts_with_multiple_windows": true,
+    "labels_constant_per_account": true,
+    "split_constant_per_account": true,
+    "no_missing_features": true,
+    "all_features_nonnegative_or_bounded": true,
+    "human_reference_leakage_guard": "human_reference is built only from label==0 & split=='train' accounts (906 accounts); no validation/test account statistics are used to construct drift targets."
+  }
+}
