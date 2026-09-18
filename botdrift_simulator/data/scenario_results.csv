@@ -1,0 +1,8 @@
+scenario,test_accounts,static_f1,periodic6_f1,da_localized_f1,static_auc,periodic6_auc,da_localized_auc,static_recall,periodic6_recall,da_localized_recall,static_precision,periodic6_precision,da_localized_precision,da_f1_advantage_vs_static,da_f1_advantage_vs_periodic6
+abrupt_evasion,38,0.3386,0.4591,0.4708,,,,0.5118,0.8487,0.8895,1.0,1.0,1.0,0.1322,0.0117
+boundary_crossing_evasion,51,0.3182,0.4346,0.4463,,,,0.4667,0.7686,0.8059,1.0,1.0,1.0,0.1281,0.0117
+gradual_evasion,63,0.3512,0.4606,0.4677,,,,0.5413,0.854,0.8786,1.0,1.0,1.0,0.1165,0.0071
+recurring_behavior,14,0.4203,0.4521,0.4542,,,,0.725,0.825,0.8321,1.0,1.0,1.0,0.0339,0.0021
+localized_evasion,27,0.4556,0.4833,0.4847,,,,0.837,0.9352,0.9407,1.0,1.0,1.0,0.0291,0.0015
+behavioral_gradual,163,0.9246,0.9453,0.9381,0.9897,0.986,0.9843,0.8226,0.9311,0.9245,0.9798,0.9216,0.9091,0.0134,-0.0072
+stable_control,244,0.9677,0.9133,0.9058,0.9952,0.9913,0.992,0.9631,0.9762,0.9762,0.931,0.7692,0.7509,-0.0619,-0.0075
