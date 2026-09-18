@@ -1,0 +1,106 @@
+{
+  "benchmark": "BotDriftBench v0.8",
+  "framework": "XGBoost",
+  "features_count": 25,
+  "models": {
+    "static_model.pkl": {
+      "file_name": "static_model.pkl",
+      "size_bytes": 599165,
+      "policy": "static",
+      "n_features": 25,
+      "n_estimators": 400,
+      "max_depth": 6,
+      "learning_rate": 0.05
+    },
+    "periodic6_model_w6.pkl": {
+      "file_name": "periodic6_model_w6.pkl",
+      "size_bytes": 728910,
+      "policy": "periodic_6",
+      "n_features": 25,
+      "n_estimators": 400,
+      "max_depth": 6,
+      "learning_rate": 0.05
+    },
+    "periodic6_model_w12.pkl": {
+      "file_name": "periodic6_model_w12.pkl",
+      "size_bytes": 810102,
+      "policy": "periodic_6",
+      "n_features": 25,
+      "n_estimators": 400,
+      "max_depth": 6,
+      "learning_rate": 0.05
+    },
+    "periodic6_model_w18.pkl": {
+      "file_name": "periodic6_model_w18.pkl",
+      "size_bytes": 863686,
+      "policy": "periodic_6",
+      "n_features": 25,
+      "n_estimators": 400,
+      "max_depth": 6,
+      "learning_rate": 0.05
+    },
+    "periodic6_final_model.pkl": {
+      "file_name": "periodic6_final_model.pkl",
+      "size_bytes": 863686,
+      "policy": "periodic_6",
+      "n_features": 25,
+      "n_estimators": 400,
+      "max_depth": 6,
+      "learning_rate": 0.05
+    },
+    "da_localized_model_w5.pkl": {
+      "file_name": "da_localized_model_w5.pkl",
+      "size_bytes": 707082,
+      "policy": "da_localized",
+      "n_features": 25,
+      "n_estimators": 400,
+      "max_depth": 6,
+      "learning_rate": 0.05
+    },
+    "da_localized_model_w8.pkl": {
+      "file_name": "da_localized_model_w8.pkl",
+      "size_bytes": 765494,
+      "policy": "da_localized",
+      "n_features": 25,
+      "n_estimators": 400,
+      "max_depth": 6,
+      "learning_rate": 0.05
+    },
+    "da_localized_model_w11.pkl": {
+      "file_name": "da_localized_model_w11.pkl",
+      "size_bytes": 795074,
+      "policy": "da_localized",
+      "n_features": 25,
+      "n_estimators": 400,
+      "max_depth": 6,
+      "learning_rate": 0.05
+    },
+    "da_localized_model_w14.pkl": {
+      "file_name": "da_localized_model_w14.pkl",
+      "size_bytes": 835058,
+      "policy": "da_localized",
+      "n_features": 25,
+      "n_estimators": 400,
+      "max_depth": 6,
+      "learning_rate": 0.05
+    },
+    "da_localized_model_w17.pkl": {
+      "file_name": "da_localized_model_w17.pkl",
+      "size_bytes": 855527,
+      "policy": "da_localized",
+      "n_features": 25,
+      "n_estimators": 400,
+      "max_depth": 6,
+      "learning_rate": 0.05
+    },
+    "da_localized_final_model.pkl": {
+      "file_name": "da_localized_final_model.pkl",
+      "size_bytes": 855527,
+      "policy": "da_localized",
+      "n_features": 25,
+      "n_estimators": 400,
+      "max_depth": 6,
+      "learning_rate": 0.05
+    }
+  }
+}

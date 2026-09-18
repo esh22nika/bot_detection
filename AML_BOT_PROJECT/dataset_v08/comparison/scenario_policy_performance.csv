@@ -1,0 +1,8 @@
+scenario,test_accounts,static_f1,periodic6_f1,da_localized_f1,da_advantage_vs_static,da_advantage_vs_periodic6
+abrupt_evasion,38,0.3351,0.4595,0.4689,0.1338,0.0094
+boundary_crossing_evasion,51,0.32,0.4389,0.4469,0.1269,0.0079
+gradual_evasion,63,0.3485,0.4608,0.4652,0.1167,0.0043
+recurring_behavior,14,0.4142,0.451,0.4542,0.04,0.0032
+localized_evasion,27,0.4567,0.4833,0.4867,0.03,0.0034
+behavioral_gradual,163,0.9319,0.9403,0.9403,0.0084,-0.0
+stable_control,244,0.9659,0.9104,0.9061,-0.0598,-0.0043

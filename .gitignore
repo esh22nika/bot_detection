@@ -1,2 +1,74 @@
-dataset/cresci-2017.csv.zip
-dataset/*.zip
+# ==============================================================================
+# Large Datasets & Raw Corpora (Exceed GitHub 100MB limit / Multi-GB raw dumps)
+# ==============================================================================
+twibot22/
+*twibot22*
+dataset/
+*cresci*
+outputs/
+
+# Compressed Archives & Packages
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+
+# Intermediate Experimental Outputs & Scratch Folders
+dataset_v03/
+dataset_v04/
+dataset_v04_holdout/
+dataset_v07/
+final_v03/
+final_v03_corrected/
+final_v04/
+results_mvp/
+results_v02/
+results_v03/
+ceiling_diagnostic/
+ceiling_diagnostic_v2/
+aggregate_evaluation/
+improved_da_evaluation/
+improved_da_final/
+improved_da_round2/
+localized_da_evaluation/
+moe_da_evaluation/
+policy_ablation/
+model_artifacts/
+
+# Python & Runtime Artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Virtual Environments
+venv/
+env/
+.env
+ENV/
+
+# Node & Package Managers
+node_modules/
+package-lock.json
+
+# Logs & Diagnostics
+*.log
+exp*.log
+
+# Editor & System Files
+.vscode/
+.idea/
+.claude/
+launch.json
+*launch.json*
+*.docx
+.DS_Store
+Thumbs.db
+desktop.ini

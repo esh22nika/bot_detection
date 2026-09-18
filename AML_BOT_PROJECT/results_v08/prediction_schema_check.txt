@@ -1,0 +1,9 @@
+predictions.csv Schema Verification
+===================================
+Rows: 36,000
+Columns: ['account_id', 'time_window', 'split', 'label', 'scenario', 'drift_onset', 'policy', 'prediction', 'probability', 'retrained']
+Unique accounts: 600
+Unique windows: 20
+Policies: ['static', 'periodic_6', 'da_localized']
+Split values: ['test']
+Labels: {0: 18720, 1: 17280}

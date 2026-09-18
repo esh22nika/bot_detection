@@ -1,0 +1,4 @@
+policy,f1_from_predictions,f1_in_aggregate_summary,f1_diff,auc_from_predictions,auc_in_aggregate_summary,auc_diff,status
+static,0.8244,0.823,0.00138,0.8943,0.8934,0.00094,CLOSE_MATCH
+periodic_6,0.9119,0.912,8e-05,0.9657,0.9658,0.00014,EXACT_MATCH
+da_localized,0.9174,0.9167,0.00073,0.969,0.9691,6e-05,CLOSE_MATCH

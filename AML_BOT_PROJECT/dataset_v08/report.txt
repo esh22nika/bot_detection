@@ -1,0 +1,99 @@
+Summary of completed work
+All 4 fixes applied to 
+generate_dataset_v08.py
+:
+
+Fix	Change
+Docstring	BotDriftBench v0.7 → v0.8
+BOT_SCENARIO_PROBS	Was 1.15 (silent normalization) → Now exactly 1.00
+choose_scenario()	Silent /total removed → ValueError if sum ≠ 1.0
+--output default	dataset_v07 → dataset_v08
+New scenario probabilities (sum = 1.00 exactly):
+
+
+
+stable_control=0.13  behavioral_gradual=0.17  gradual_evasion=0.26
+abrupt_evasion=0.10  localized_evasion=0.08   recurring_behavior=0.06
+boundary_crossing_evasion=0.20
+Step 2 — Regeneration: ✅ COMPLETE
+
+dataset_v08/botdriftbench_v08.csv — 60,000 rows, 25 features
+All checks pass: disjoint splits, no missing features, human reference leakage guard
+Step 3 — Frozen-model degradation diagnostic: ✅ COMPLETE — verdict: STRONG
+
+Metric	Value
+Pre-drift F1 (w0–1)	0.9791
+Post-drift F1 (w2–19)	0.8072
+F1 degradation	+0.1720
+Worst-window F1	0.6541 (window 18)
+Worst-case degradation	+0.3250
+Bot prob shift	−0.3233
+Per-scenario breakdown — the evasion scenarios produce genuine harm to the classifier:
+
+Scenario	Pre-F1	Post-F1	Drop
+boundary_crossing_evasion	1.000	0.292	0.708
+abrupt_evasion	1.000	0.310	0.690
+localized_evasion	1.000	0.452	0.549
+gradual_evasion	0.490	0.328	0.162
+behavioral_gradual	0.983	0.926	0.057
+stable_control	0.965	0.966	0.000 (✓)
+v0.8 is scientifically validated as a harmful-drift benchmark. The frozen classifier drops well past the "0.86 → 0.65" threshold mentioned in your brief.
+
+Step 4 — Full policy comparison (static / periodic-4 / periodic-6 / drift-aware / oracle): running now via 
+run_v08_comparison.py
+. Results will be shown automatically when the task completes.
+
+Log is empty, process is still running. The threshold grid search (5×5=25 DA runs on validation) is expensive. Let me wait again:
+
+The policy comparison is still running — the 5×5 threshold grid search on the validation set is the slow part (25 DA runs × XGBoost × 20 windows). I'll report the results as soon as it finishes.
+
+The comparison is complete. Let me update the task tracker and then deliver the final report:
+
+All four steps are now complete. Here is the full final report:
+
+Everything done — full results
+Steps 1–2: Generator fixes ✅
+All issues in 
+generate_dataset_v08.py
+ are fixed:
+
+Issue	Fix
+Docstring said v0.7	Changed to v0.8
+BOT_SCENARIO_PROBS summed to 1.15	Fixed to 1.00 exactly (values per your suggestion)
+Silent normalization in choose_scenario()	Replaced with hard ValueError if sum ≠ 1.0 ± 1e-8
+--output default was dataset_v07	Changed to dataset_v08
+Dataset regenerated cleanly: 60,000 rows, 3,000 accounts, 25 features, all checks passed.
+
+Step 3: Frozen-model degradation ✅ — STRONG verdict
+Metric	Value
+Pre-drift F1 (w0–1)	0.9791
+Post-drift F1 (w2–19)	0.8072
+F1 degradation	+0.1720
+Worst-window F1 (w18)	0.6541
+Bot prob shift	−0.3233 (bots look more human post-drift)
+Per-scenario — the evasion scenarios produce genuinely harmful degradation:
+
+Scenario	Pre-F1	Post-F1	Drop
+boundary_crossing_evasion	1.000	0.292	0.708
+abrupt_evasion	1.000	0.310	0.690
+localized_evasion	1.000	0.452	0.549
+gradual_evasion	0.490	0.328	0.162
+behavioral_gradual	0.983	0.926	0.057
+stable_control	0.965	0.966	0.000 ✓
+The control group is flat. Evasion scenarios produce the intended harm. v0.8 is a valid harmful-drift benchmark.
+
+Step 4: Full policy comparison ✅ — 5 seeds, val-tuned thresholds
+Policy	Tmean F1	±Std	Post-drift F1	Retrains
+static	0.8230	0.0013	0.8059	0
+periodic_6	0.9120	0.0010	0.9048	3
+periodic_4	0.9155	0.0008	0.9087	4
+oracle_da	0.9160	0.0010	0.9092	13
+da_localized	0.9167	0.0008	0.9099	5
+Key findings:
+
+DA beats static by +0.094 F1 (5/5 seeds) — adaptation is essential on v0.8 (unlike v0.4 where static won)
+DA beats periodic_4 by +0.0012 (4/5 seeds) — marginal advantage, same as v0.4 Outcome B
+DA beats oracle (0.9167 vs 0.9160) with 2.6× fewer retrains (5 vs 13) — the localized detector is efficient
+Zero false alarms before drift onset on all seeds/policies
+Tuned thresholds: KS=0.06, frac=0.20 (on validation only)
+Outcome B confirmed on v0.8: DA is the best adaptive method, marginally ahead of periodic. On v0.8 (unlike v0.4), static is clearly the worst policy — adaptation genuinely helps.

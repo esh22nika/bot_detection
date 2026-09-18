@@ -1,0 +1,6 @@
+tier,n_accounts,pre_drift_f1,post_drift_f1,f1_degradation
+medium,94,0.9767,0.7537,0.2229
+hard,65,0.4942,0.2773,0.2168
+medium_hard,161,0.9741,0.7899,0.1843
+easy,36,1.0,0.8465,0.1535
+control,244,0.965,0.966,-0.001

@@ -1,0 +1,23 @@
+{
+  "policy": "da_localized",
+  "detection_method": "Localized KS on train bot population",
+  "ks_threshold": 0.06,
+  "fraction_threshold": 0.2,
+  "global_min_drift_onset": 2,
+  "first_detection_window": 5,
+  "detection_delay_windows": 3,
+  "false_alarms_before_drift": 0,
+  "true_detections": 5,
+  "missed_detections": 0,
+  "number_of_retrains": 5,
+  "retrain_windows": [
+    5,
+    8,
+    11,
+    14,
+    17
+  ],
+  "average_retraining_interval": 3.0,
+  "performance_before_drift_f1": 0.977,
+  "performance_after_detection_f1": 0.9099
+}

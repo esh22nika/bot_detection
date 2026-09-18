@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BotDriftBench: Static vs Drift-Aware Bot Detection Simulator</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google Fonts for clean academic typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation / Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="title-group">
+        <div class="badge-row">
+          <span class="badge badge-replay">Benchmark Replay / Simulator</span>
+          <span class="badge badge-version">BotDriftBench v0.8</span>
+        </div>
+        <h1>BotDriftBench: Static vs Drift-Aware Detection</h1>
+        <p class="subtitle">Interactive demonstration of behavioral drift and localized adaptation</p>
+      </div>
+      <div class="research-attribution">
+        <span>Empirical Benchmark: <strong>3,000 accounts · 20 windows · 25 features</strong></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Simulator Container -->
+  <main class="simulator-layout">
+
+    <!-- Status Bar -->
+    <section class="status-bar">
+      <div class="status-pill">
+        <span class="status-label">Simulation Window:</span>
+        <span class="status-value highlight" id="window-display">Window 0 / 19</span>
+      </div>
+      <div class="status-pill">
+        <span class="status-label">Environment:</span>
+        <span class="status-value" id="env-display">Stable (Pre-Drift)</span>
+      </div>
+      <div class="status-pill">
+        <span class="status-label">Drift Status:</span>
+        <span class="status-value" id="drift-display">Inactive</span>
+      </div>
+      <div class="status-pill">
+        <span class="status-label">Adaptation State:</span>
+        <span class="status-value" id="adaptation-display">None Required</span>
+      </div>
+    </section>
+
+    <!-- Control Panel -->
+    <section class="control-panel">
+      <div class="control-buttons">
+        <button id="btn-before-drift" class="btn btn-stable" title="Reset to initial stable pre-drift state">
+          🛡️ Before Drift
+        </button>
+        <button id="btn-inject-drift" class="btn btn-drift" title="Activate behavioral evasion drift">
+          ⚠️ Inject Drift
+        </button>
+        <button id="btn-run-adaptation" class="btn btn-adapt" title="Run localized KS detection and adaptation">
+          ⚡ Run Adaptation
+        </button>
+        <button id="btn-step" class="btn btn-step" title="Advance simulation by exactly one window">
+          ⏩ Step (+1 Window)
+        </button>
+        <button id="btn-reset" class="btn btn-reset" title="Reset simulation to initial state">
+          🔄 Reset
+        </button>
+      </div>
+    </section>
+
+    <!-- Side-by-Side Metric Cards -->
+    <section class="metric-comparison-grid">
+      
+      <!-- Static Detector Card -->
+      <div class="detector-card card-static" id="card-static">
+        <div class="card-header">
+          <div class="detector-title">
+            <span class="detector-icon">❄️</span>
+            <h3>Static Detector</h3>
+          </div>
+          <span class="status-tag tag-stable" id="static-status-tag">STABLE</span>
+        </div>
+        <p class="card-desc">Frozen XGBoost baseline trained on window 0–1; decision boundary remains fixed.</p>
+        
+        <div class="metrics-row">
+          <div class="metric-item">
+            <span class="metric-name">Macro-F1</span>
+            <span class="metric-number" id="static-f1">0.9746</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-name">ROC-AUC</span>
+            <span class="metric-number" id="static-auc">0.9969</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-name">Bot Recall</span>
+            <span class="metric-number" id="static-recall">0.9708</span>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <span>Retraining Count: <strong id="static-retrains">0 (Frozen)</strong></span>
+        </div>
+      </div>
+
+      <!-- Drift-Aware Detector Card -->
+      <div class="detector-card card-drift-aware" id="card-drift-aware">
+        <div class="card-header">
+          <div class="detector-title">
+            <span class="detector-icon">🛡️</span>
+            <h3>Proposed Drift-Aware Detector</h3>
+          </div>
+          <span class="status-tag tag-stable" id="da-status-tag">STABLE</span>
+        </div>
+        <p class="card-desc">Monitors feature shifts via localized KS tests and retrains with exponential recency weighting.</p>
+        
+        <div class="metrics-row">
+          <div class="metric-item">
+            <span class="metric-name">Macro-F1</span>
+            <span class="metric-number" id="da-f1">0.9746</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-name">ROC-AUC</span>
+            <span class="metric-number" id="da-auc">0.9969</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-name">Bot Recall</span>
+            <span class="metric-number" id="da-recall">0.9708</span>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <span>Adaptations Triggered: <strong id="da-retrains">0 events</strong></span>
+          <span class="advantage-badge" id="da-advantage">+0.0000 F1 advantage</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Dynamic Explanation Panel -->
+    <section class="explanation-box" id="explanation-box">
+      <div class="explanation-header">
+        <span class="info-icon">💡</span>
+        <h4>Simulation Insight</h4>
+      </div>
+      <p id="explanation-text">
+        Both detectors operate in a stable environment, so their performance is similar. The static baseline achieves strong discrimination (F1 = 0.975–0.979) without requiring adaptation.
+      </p>
+    </section>
+
+    <!-- Charts Section -->
+    <section class="charts-grid">
+      
+      <!-- Performance Trajectory Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Temporal Macro-F1 Trajectory Across 20 Windows</h3>
+          <span class="chart-sub">Replay from BotDriftBench v0.8 (600 held-out test accounts)</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="performanceChart"></canvas>
+        </div>
+        <div class="chart-legend-custom">
+          <span class="legend-item"><span class="legend-dot dot-static"></span> Static Detector</span>
+          <span class="legend-item"><span class="legend-dot dot-da"></span> Localized Drift-Aware Detector</span>
+          <span class="legend-item"><span class="legend-line line-drift"></span> Drift Onset (Window 2)</span>
+          <span class="legend-item"><span class="legend-line line-adapt"></span> First Adaptation (Window 5)</span>
+        </div>
+      </div>
+
+      <!-- Feature Distribution Shift Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Behavioral Feature Distribution Shift Under Evasion</h3>
+          <div class="feature-picker">
+            <label for="feature-select">Feature:</label>
+            <select id="feature-select">
+              <option value="content_similarity" selected>Content Similarity</option>
+              <option value="posting_regularity">Posting Regularity</option>
+              <option value="url_ratio">URL Ratio</option>
+              <option value="burst_score">Burst Score</option>
+              <option value="followers_count">Followers Count</option>
+            </select>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="distributionChart"></canvas>
+        </div>
+        <div class="dist-means">
+          <span>Pre-Drift Mean: <strong id="pre-mean">-</strong></span>
+          <span>Post-Drift Mean: <strong id="post-mean">-</strong></span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Event Timeline Log -->
+    <section class="timeline-section">
+      <div class="section-title">
+        <h3>Benchmark Event Log</h3>
+        <span class="sub-text">Empirical detection and adaptation milestones</span>
+      </div>
+      <div class="timeline-container" id="timeline-container">
+        <!-- Event cards will be dynamically injected here -->
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <p>BotDriftBench v0.8 Longitudinal Bot Detection Simulator · Developed for Rigorous Empirical Research Evaluation</p>
+  </footer>
+
+  <script src="/static/js/charts.js"></script>
+  <script src="/static/js/simulator.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
