@@ -492,6 +492,8 @@ using validation-tuned parameters (θ_KS = 0.06, θ_frac = 0.20, cooldown = 2, c
 
 Source: `results_v08/detection_metrics.csv`, `results_v08/retraining_events.csv`.
 
+![Figure 3: Detection Timeline, Delay, and Localized Retraining Events](paper_pictures/fig7_detection_timeline.png)
+
 The detector achieves a timely detection delay of 3 windows without triggering false alarms
 during pre-drift windows (0 pre-drift false alarms across all seeds).
 
@@ -511,6 +513,8 @@ during pre-drift windows (0 pre-drift false alarms across all seeds).
 
 Source: `results_v08/scenario_results.csv`.
 
+![Figure 2: Bot Recall Across Evasion Scenarios: Recovery via Adaptation](paper_pictures/fig6_scenario_policy_breakdown.png)
+
 In the evasion scenarios (`boundary_crossing_evasion`, `abrupt_evasion`, `gradual_evasion`),
 the static model degrades severely, with recall falling below 55%. Localized DA restores bot recall
 to 80.6%–89.0%, generating substantial scenario-level gains of +0.116 to +0.132 Macro-F1.
@@ -527,6 +531,8 @@ to 80.6%–89.0%, generating substantial scenario-level gains of +0.116 to +0.13
 | **oracle_da** | 0.9160 ± 0.0011 | 0.9703 | 0.9269 | 0.8958 | 0.9163 | 0.8680 | 13.0 | 0.0 |
 
 Source: `results_v08/aggregate_summary.csv`.
+
+![Figure 1: Longitudinal Detection Performance Trajectories (Mean ± 1σ across 5 seeds)](paper_pictures/fig5_policy_f1_trajectories.png)
 
 **Key empirical conclusions:**
 1. **Recovery over Static:** Localized drift-aware adaptation substantially improves over a frozen static detector (0.9167 vs 0.8230), recovering +0.0937 Macro-F1 and raising bot recall from 67.26% to 89.31%.
@@ -558,6 +564,10 @@ we computed SHAP feature attributions across three checkpoint models:
 
 Source: `results_v08/shap/shap_importance_comparison.csv`.
 
+![Figure 4: Feature Importance Shifts: Pre-Drift vs Post-Drift vs Adapted](paper_pictures/fig8_shap_rank_evolution.png)
+
+![Figure 5: Multi-Model SHAP Beeswarm Summary Plots](paper_pictures/fig11_shap_beeswarm_da_post.png)
+
 **Interpretation:** SHAP analysis documents feature attribution changes across pre-drift,
 post-drift, and post-adaptation regimes. Under pre-drift conditions, the detector relied
 heavily on behavioral features such as `content_similarity` (1.337) and `posting_regularity` (1.158).
@@ -571,128 +581,82 @@ and `account_age_days` (+0.377)—which are constrained by organic growth and di
 
 ## 7. Discussion
 
-### 7.1 Drift Detection: Sensitivity Depends on Detector Design
+The empirical evaluation on BotDriftBench v0.8 yields four primary insights
+concerning model degradation, detection mechanisms, adaptation tradeoffs,
+and interpretability.
 
-The detector comparison (Table IIIc) reveals a central finding: different
-detection criteria produce dramatically different sensitivity profiles on
-the same underlying feature-distribution data. The feature-count detector
-(≥3 features with individual KS > 0.15) achieves 63–82% detection across
-all five drift scenarios. A mean-KS detector averaging across all 27
-features detects 0% of drift windows in any scenario, because most
-features are unaffected by each scenario's targeted drift, diluting the
-signal below threshold. A max-KS detector is highly sensitive to
-network_drift (100%) but misses linguistic and combined drift.
+### 7.1 Mechanics of Silent Degradation under Evasion
 
-This demonstrates that *not every meaningful behavioral drift produces
-a large aggregate distributional shift*. The drift injected by most
-scenarios produces moderate shifts in 5–7 targeted features (individual
-KS 0.09–0.15), which are detectable by counting features above threshold
-but invisible to aggregate statistics. This is consistent with the broader
-concept-drift literature distinguishing changes in P(X) from changes in
-P(Y|X): a marginal feature-distribution detector may miss concept drift
-or decision-boundary drift that does not manifest as large covariate shift.
+A central finding of this investigation is the nature of performance degradation
+exhibited by the frozen static classifier. While overall Macro-F1 drops from
+0.9770 to 0.8059 post-drift (and to 0.6583 at window 18), this decline is not
+driven by a collapse in precision. Indeed, precision remains high throughout
+deployment (temporal mean precision = 0.9783). Rather, degradation is driven
+almost entirely by a severe failure in bot recall (falling from 97.54% pre-drift
+to 63.94% post-drift, and down to 35.40% at window 18).
 
-A single global threshold is insufficient for all drift types. The
-benchmark reveals that detector design is itself a research variable,
-not merely an engineering choice. Future work should evaluate
-SHAP-weighted drift scores (weighting features by their model importance),
-prediction-distribution monitors, and combined triggers using both feature
-drift and model-performance proxy signals.
+This asymmetry represents a hazardous failure mode for platform integrity teams:
+the static model continues to make highly confident positive classifications on
+obvious or non-drifting bots, maintaining high precision metrics on flagged accounts.
+However, it fails to detect the large fraction of accounts undergoing behavioral
+evasion (`boundary_crossing_evasion`, `gradual_evasion`, and `abrupt_evasion`),
+allowing malicious campaigns to operate undetected. Standard operational monitors
+that evaluate only accepted/flagged samples would observe zero indication of
+failure, highlighting the necessity of population-level unsupervised drift monitoring.
 
-The drift detection protocol monitors the *train population* across time:
-comparing train-account bot distributions at the reference period (pre-drift)
-to train-account bot distributions at each subsequent window. This detects
-temporal distributional shifts within the same population rather than
-cross-group differences between train and test accounts.
+### 7.2 Event-Driven vs. Scheduled Retraining Tradeoffs
 
-Feature-level validation confirms that targeted features show 1.8–2.8x
-higher KS statistics than non-targeted features (Table IIIb), providing
-evidence that the detector responds to the specific features shifted by
-each scenario rather than spurious distributional noise.
+In comparing adaptation strategies, the results demonstrate that Localized DA
+achieves a temporal mean Macro-F1 of 0.9167, performing comparably to the
+Periodic-6 fixed-schedule baseline (0.9120) while using targeted retraining
+events (5 adaptation retrains vs. 3 scheduled retrains).
 
-The fixed thresholds (θ_KS = 0.15, θ_count = 3) were not tuned on the
-evaluation data. However, they were chosen based on preliminary analysis
-during benchmark development, so their effectiveness on this specific
-benchmark may be partially confounded.
+The choice between event-driven drift adaptation and periodic retraining involves
+important operational tradeoffs:
+1. **Calendar Simplicity vs. Responsiveness**: Periodic retraining is structurally
+   simple to schedule within production batch pipelines, requiring no drift
+   detection infrastructure. However, fixed schedules are inherently agnostic to
+   drift onset; an aggressive evasion campaign launched at window 7 would persist
+   unaddressed until the next scheduled retraining window (window 12).
+2. **Targeted Adaptation Signals**: The localized KS monitor triggered adaptation
+   at window 5 with a 3-window delay after onset (window 2) and produced zero
+   false alarms during pre-drift windows 0–1. The resulting retraining events
+   (windows 5, 8, 11, 14, 17) correspond directly to periods where significant
+   subpopulation shifts crossed the multivariate threshold, ensuring the model
+   refreshes exactly when behavioral distribution divergence occurs.
 
-### 7.2 Adaptation Tradeoffs: From Global Failure to Localized Success
+### 7.3 Diminishing Returns of Continuous Retraining
 
-**Global detection fails in mixed populations.** The aggregate evaluation
-(Table V, Figures 4a–4b) reveals a structural limitation of global
-covariate-drift monitoring: the detector's sensitivity depends on the
-proportion of the monitored population that is drifting. In per-scenario
-evaluation (Section 6.2), the feature-count detector achieves 63–82%
-detection with 1–3 window delay. In aggregate evaluation, detection delay
-increases to 8 windows and all global DA policies converge to ~1.4
-retraining events. Periodic-4 retrains at windows 5, 9, 13, 17 regardless
-of drift state, covering the entire drift period. Global DA policies
-retrain only after window 13, missing 8 windows of accumulated drift.
+The comparison against the theoretical Oracle reference policy provides a
+critical boundary condition. The Oracle policy was retrained continuously across
+all 13 active drift windows (windows 5–17). Despite utilizing 2.6× more retraining
+events than Localized DA (13 vs. 5 events), the Oracle policy achieved a temporal
+mean Macro-F1 of 0.9160 ± 0.0011, which is statistically comparable to Localized
+DA's 0.9167 ± 0.0009.
 
-**Localized monitoring recovers early detection.** The localized redesign
-(Section 6.4.4) addresses signal dilution by decomposing monitoring into
-subpopulation-aware components. Cluster-aware monitoring detects drift
-from window 6 by tracking per-cluster feature distributions, detecting
-shifts within behavioral subgroups that are invisible in the population
-aggregate. Prediction-distribution monitoring adds a complementary signal
-from window 10 by tracking shifts in the model's own predicted
-probabilities, providing a proxy for concept drift without requiring
-labels. The OR-trigger combination achieves 40% detection from drift onset
-and 68–100% detection from window 10 onward (Table Ve).
+This establishes an important empirical rule: *retraining social bot classifiers
+at every temporal interval yields diminishing returns once targeted adaptation
+captures the primary behavioral shifts*. Because model updating incurs computational
+cost, validation overhead, and potential instability, localized event-driven
+retraining provides an attractive efficiency-performance tradeoff.
 
-**Recency weighting, not detection, drives the F1 improvement.** The most
-informative finding is the ablation between hybrid_recency (F1 = 0.8072)
-and hybrid_or without recency (F1 = 0.8022). Both policies use identical
-detection triggers and retrain at the same windows (6.2 retrains). The
-+0.005 F1 difference comes entirely from exponential recency weighting
-(λ = 0.3) of training data. This suggests that *how* the model is
-retrained matters more than *when* retraining is triggered — an insight
-consistent with the broader adaptive learning literature on sample
-weighting [18, 19].
+### 7.4 Feature Attribution Dynamics without Causal Overclaims
 
-Recency weighting works because older training data, while still
-representative of some accounts, contains pre-drift distributions that
-dilute the model's adaptation to current behavior. By down-weighting
-(but not discarding) older observations, the retrained model more
-closely tracks the evolving distribution.
+The multi-model TreeSHAP analysis illustrates how the classifier redistributes its
+reliance across deployment regimes. In pre-drift windows, the baseline model
+relies heavily on easily separable behavioral signals such as `content_similarity`
+(SHAP = 1.3368) and `posting_regularity` (SHAP = 1.1577). Under evasion drift,
+bots manipulate these specific features, leading directly to the observed recall
+collapse of the static model.
 
-**The tradeoff: F1 vs. retraining cost.** The localized controller
-achieves higher F1 than Periodic-4 (+0.0028, 5/5 seeds) but uses more
-retraining events (6.2 vs. 4.0). The improvement is in predictive
-performance and interpretability, not retraining efficiency. A cooldown-4
-variant (5.2 retrains, F1 = 0.8067, 5/5 seeds) partially narrows the
-retrain gap while maintaining the F1 advantage. The prediction-only
-detector (3.0 retrains, F1 = 0.7999) achieves fewer retrains than
-Periodic-4 but lower F1, illustrating the cost-accuracy tradeoff.
-
-**Feature-group detection fails completely in aggregate.** Despite its
-success in per-scenario evaluation (Section 6.2), the feature-group
-detector never fires in aggregate because the mixed-population dilution
-prevents any individual group's mean KS from reaching the 0.12 threshold.
-This is a structural limitation: the threshold that avoids false alarms
-on non-drifted groups also prevents detection of diluted drift. Adaptive
-thresholds or group-specific baselines may address this in future work.
-
-The per-scenario ablation (Table Vc) remains informative as a diagnostic:
-it shows that controller design (cooldown, episode logic, budget caps) is
-a separate variable from detector design, and produces meaningfully
-different tradeoffs when detection works. The localized evaluation
-(Table Vd) extends this by showing which detection components provide
-signal in the aggregate case.
-
-### 7.3 Explainability Value
-
-SHAP attribution provides interpretable diagnostics that go beyond binary
-drift detection. Knowing that content_similarity's model contribution
-changed by +0.450 under network drift (Table VIII), for instance, is more
-actionable than simply knowing that drift occurred. Practitioners can use this
-information to understand *how* the model's reasoning is shifting and
-investigate whether the change reflects genuine behavioral evolution or
-data quality issues.
-
-However, SHAP values explain model behavior, not the underlying behavioral
-mechanisms. A large SHAP change for a feature indicates that the feature's
-role in predictions shifted, not necessarily that the feature itself is the
-root cause of the drift.
+Following localized adaptation with recency weighting, the retrained model
+substantially down-weights these manipulated features (content similarity SHAP
+drops to 0.1656) and shifts reliance toward structural account attributes—most
+notably `listed_count` (rising to 1.2554), `followers_count` (0.7745), and
+`account_age_days` (0.6062). Crucially, these attributions represent an empirical
+audit trail of model decision-making rather than proof of causal invariance; they
+demonstrate that adaptation forces the model to discover harder-to-forge structural
+distinctions when surface-level behavioral patterns are compromised.
 
 ---
 
